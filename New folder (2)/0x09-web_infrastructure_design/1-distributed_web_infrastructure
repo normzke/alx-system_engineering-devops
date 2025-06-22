@@ -1,0 +1,57 @@
+```mermaid
+flowchart TD
+  User["User"]
+  DNS["DNS: www.foobar.com (A record)\nPoints to Load Balancer IP"]
+  LB["HAProxy Load Balancer"]
+  Web1["Server 1: Nginx (Web Server) + App Server + App Files"]
+  Web2["Server 2: Nginx (Web Server) + App Server + App Files"]
+  DBPrimary["MySQL Database (Primary)"]
+  DBReplica["MySQL Database (Replica)"]
+
+  User -->|HTTP Request| DNS
+  DNS -->|Resolves to| LB
+  LB -->|Distributes traffic| Web1
+  LB -->|Distributes traffic| Web2
+  Web1 --> DBPrimary
+  Web2 --> DBPrimary
+  DBPrimary -->|Replication| DBReplica
+
+  style User fill:#fff,stroke:#333,stroke-width:2px
+  style DNS fill:#fff,stroke:#333,stroke-width:2px
+  style LB fill:#fff,stroke:#333,stroke-width:2px
+  style Web1 fill:#fff,stroke:#333,stroke-width:2px
+  style Web2 fill:#fff,stroke:#333,stroke-width:2px
+  style DBPrimary fill:#fff,stroke:#333,stroke-width:2px
+  style DBReplica fill:#fff,stroke:#333,stroke-width:2px
+```
+
+1. Screenshot of whiteboard diagram: [Insert your Imgur or image link here]
+
+2. Explanations:
+- **Why add each element:**
+  - Load Balancer (HAProxy): Distributes incoming traffic between servers to improve availability and scalability.
+  - 2 Servers: Allow for redundancy and load distribution, reducing SPOF and handling more traffic.
+  - Nginx (Web Server): Handles HTTP requests, serves static files, and forwards dynamic requests to the application server.
+  - Application Server: Runs the application code and processes dynamic requests.
+  - Application Files: The code base for the website, deployed on both servers.
+  - MySQL Database (Primary-Replica): Ensures data redundancy and allows for read scaling and backup.
+
+- **Load balancer distribution algorithm:**
+  - Example: Round Robin. The load balancer forwards each new request to the next server in the list, distributing load evenly.
+
+- **Active-Active vs Active-Passive:**
+  - Active-Active: Both servers handle requests simultaneously (as in this setup).
+  - Active-Passive: Only one server handles requests; the other is on standby and takes over if the active one fails.
+
+- **Database Primary-Replica (Master-Slave) cluster:**
+  - The Primary node handles all writes and propagates changes to the Replica node(s), which can be used for read-only queries and backup.
+
+- **Difference between Primary and Replica nodes:**
+  - The Primary node accepts both reads and writes; the Replica node only accepts reads and receives updates from the Primary.
+
+3. Issues:
+- SPOF: The load balancer and the database primary are single points of failure.
+- Security: No firewall or HTTPS is implemented, making the system vulnerable to attacks.
+- No monitoring: There is no system in place to detect failures or performance issues.
+
+Screenshot: [Insert your Imgur or image link here] 

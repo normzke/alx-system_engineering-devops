@@ -1,0 +1,75 @@
+```mermaid
+flowchart TD
+  User["User"]
+  FW1["Firewall 1"]
+  DNS["DNS: www.foobar.com (A record)\nPoints to Load Balancer IP"]
+  LB["HAProxy Load Balancer\n(SSL Termination, HTTPS)"]
+  FW2["Firewall 2"]
+  Web1["Server 1: Nginx + App Server + App Files\nMonitoring Client"]
+  Web2["Server 2: Nginx + App Server + App Files\nMonitoring Client"]
+  FW3["Firewall 3"]
+  DBPrimary["MySQL Database (Primary)\nMonitoring Client"]
+  DBReplica["MySQL Database (Replica)"]
+  SSL["SSL Certificate"]
+
+  User -->|HTTPS Request| FW1
+  FW1 --> DNS
+  DNS -->|Resolves to| LB
+  LB -->|HTTPS| FW2
+  FW2 --> Web1
+  FW2 --> Web2
+  Web1 --> FW3
+  Web2 --> FW3
+  FW3 --> DBPrimary
+  DBPrimary -->|Replication| DBReplica
+  LB -.->|Uses| SSL
+
+  Web1 -.->|Monitoring Data| DBPrimary
+  Web2 -.->|Monitoring Data| DBPrimary
+  DBPrimary -.->|Monitoring Data| DBPrimary
+
+  style User fill:#fff,stroke:#333,stroke-width:2px
+  style FW1 fill:#fff,stroke:#333,stroke-width:2px
+  style FW2 fill:#fff,stroke:#333,stroke-width:2px
+  style FW3 fill:#fff,stroke:#333,stroke-width:2px
+  style DNS fill:#fff,stroke:#333,stroke-width:2px
+  style LB fill:#fff,stroke:#333,stroke-width:2px
+  style Web1 fill:#fff,stroke:#333,stroke-width:2px
+  style Web2 fill:#fff,stroke:#333,stroke-width:2px
+  style DBPrimary fill:#fff,stroke:#333,stroke-width:2px
+  style DBReplica fill:#fff,stroke:#333,stroke-width:2px
+  style SSL fill:#fff,stroke:#333,stroke-width:2px
+```
+
+1. Screenshot of whiteboard diagram: [Insert your Imgur or image link here]
+
+2. Explanations:
+- **Why add each element:**
+  - Firewalls: Protect each network segment (public, application, database) from unauthorized access.
+  - SSL Certificate: Encrypts traffic between users and the load balancer, ensuring secure communication over HTTPS.
+  - Monitoring Clients: Collect and send metrics/logs to a monitoring service for visibility and alerting.
+
+- **What are firewalls for:**
+  - Firewalls restrict and control incoming and outgoing network traffic based on security rules, reducing attack surfaces.
+
+- **Why is the traffic served over HTTPS:**
+  - HTTPS encrypts data in transit, protecting user data and preventing eavesdropping or tampering.
+
+- **What monitoring is used for:**
+  - Monitoring tracks system health, performance, and security, enabling proactive issue detection and response.
+
+- **How the monitoring tool is collecting data:**
+  - Monitoring clients run on each server, collecting metrics (CPU, memory, QPS, logs) and sending them to a central monitoring service.
+
+- **How to monitor web server QPS:**
+  - Configure the monitoring client to collect and report the number of HTTP requests per second (QPS) from the web server logs or metrics endpoint.
+
+3. Issues:
+- **SSL termination at the load balancer:**
+  - If SSL is terminated at the load balancer, traffic between the load balancer and backend servers is unencrypted, exposing data to internal threats.
+- **Only one MySQL server accepting writes:**
+  - The primary database is a SPOF; if it fails, no writes can be processed.
+- **All servers with same components:**
+  - Increases attack surface and resource usage; a compromise on one server could expose all services.
+
+Screenshot: [Insert your Imgur or image link here] 

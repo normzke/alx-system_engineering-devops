@@ -1,0 +1,23 @@
+#!/bin/bash
+
+# Update package list
+apt-get update
+
+# Install nginx with -y flag to avoid prompts
+apt-get install -y nginx
+
+# Create the default nginx configuration to serve "Hello World!"
+cat > /var/www/html/index.nginx-debian.html << 'EOF'
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Welcome to nginx!</title>
+</head>
+<body>
+    <h1>Hello World!</h1>
+</body>
+</html>
+EOF
+
+# Start nginx service
+service nginx start 

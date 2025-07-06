@@ -1,0 +1,50 @@
+#!/bin/bash
+
+# Update package list
+apt-get update
+
+# Install nginx with -y flag to avoid prompts
+apt-get install -y nginx
+
+# Create the default nginx configuration to serve "Hello World!"
+cat > /var/www/html/index.nginx-debian.html << 'EOF'
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Welcome to nginx!</title>
+</head>
+<body>
+    <h1>Hello World!</h1>
+</body>
+</html>
+EOF
+
+# Create custom 404 page
+cat > /var/www/html/404.html << 'EOF'
+Ceci n'est pas une page
+EOF
+
+# Configure nginx with custom 404 page
+cat > /etc/nginx/sites-available/default << 'EOF'
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+    
+    root /var/www/html;
+    index index.nginx-debian.html;
+    
+    server_name _;
+    
+    location / {
+        try_files $uri $uri/ =404;
+    }
+    
+    error_page 404 /404.html;
+    location = /404.html {
+        internal;
+    }
+}
+EOF
+
+# Start nginx service
+service nginx start 
